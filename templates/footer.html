@@ -1,0 +1,83 @@
+{% if not hide_footer %}
+<!-- Company policies -->
+<div class="container-fluid p-5 mt-5">
+  <div class="row text-center">
+    <div class="col-md-3 col-sm-6 mb-4">
+      <div class="">
+        <i class="bi bi-cart3 fs-1 text-warning"></i>
+      </div>
+      <h3 class="fw-light">Free Delivery</h3>
+      <p class="fw-normal">Enjoy fast and free delivery on all orders, no matter the size or value.</p>
+    </div>
+
+    <div class="col-md-3 col-sm-6 mb-4">
+      <div >
+        <i class="bi bi-person-lock fs-1 text-warning"></i>
+      </div>
+      <h3 class="fw-light">100% Secure Payment</h3>
+      <p class="fw-normal">Your payment information is protected with advanced encryption and safety measures.</p>
+    </div>
+
+    <div class="col-md-3 col-sm-6 mb-4">
+      <div>
+        <i class="bi bi-tags fs-1 text-warning"></i>
+      </div>
+      <h3 class="fw-light">Daily Offer</h3>
+      <p class="fw-normal">Unlock exciting discounts and special deals every day on pet products.</p>
+    </div>
+
+    <div class="col-md-3 col-sm-6 mb-4">
+      <div class="fs-1 text-warning">
+        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32" fill="currentColor">
+          <path d="M16 3c-.625 0-1.246.21-1.781.594L12.563 4.75L10.655 5h-.031l-.031.031A3.39 3.39 0 0 0 8.03 7.594L8 7.625v.031l-.25 1.938l-1.156 1.5l-.032.031v.031c-.699 1.117-.73 2.559.032 3.625l1.187 1.656l.313 1.72l-3.219 4.905l-1.031 1.532h4.781l1.156 2.687L10.5 29l1.031-1.563l3.156-4.75c.848.348 1.805.38 2.626 0l3.156 4.75L21.5 29l.719-1.719l1.156-2.687h4.781l-1.031-1.532L24 18.313l.25-1.875l1.156-1.656l.032-.031v-.031c.699-1.117.73-2.528-.032-3.594L24.25 9.469l-.375-1.875h.031c-.004-.024-.027-.04-.031-.063c-.18-1.308-1.215-2.37-2.531-2.531h-.032l-1.875-.25l-1.656-1.156A3.07 3.07 0 0 0 16 3z"/>
+        </svg>
+      </div>
+      <h3 class="fw-light">Quality Guarantee</h3>
+      <p class="fw-normal">We ensure premium quality in every product to keep your pets healthy and happy.</p>
+    </div>
+  </div>
+</div>
+
+ <!-- Footer content -->
+<div class="container py-5">
+  <div class="row text-center text-md-start">
+    <!-- Logo & Social Icons -->
+    <div class="col-md-4 mb-4 p-5">
+      <div style="cursor: pointer;">
+        <img src="/static/images/logo.png" alt="Logo" class="mb-3 img-fluid" style="max-width: 200px;">
+        <div class="d-flex justify-content-center justify-content-md-start gap-3 fs-1">
+          <i class="bi bi-facebook"></i>
+          <i class="bi bi-whatsapp"></i>
+          <i class="bi bi-instagram"></i>
+          <i class="bi bi-youtube"></i>
+          <i class="bi bi-twitter"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="col-md-4 mb-4">
+      <h4 class="fw-bold">Quick Links</h4>
+      <div class="list-group list-group-flush">
+        <a href="{% url 'home' %}" class="list-group-item list-group-item-action bg-transparent border-0">Home</a>
+        <a href="{% url 'shop' %}" class="list-group-item list-group-item-action bg-transparent border-0">Shop</a>
+        <a href="#contact" class="list-group-item list-group-item-action bg-transparent border-0">Contact</a>
+        <a href="{% url 'aboutus' %}" class="list-group-item list-group-item-action bg-transparent border-0">About us</a>
+      </div>
+    </div>
+
+    <!-- Help Center -->
+    <div class="col-md-4 mb-4">
+      <h4 class="fw-bold">Help Center</h4>
+      <div class="list-group list-group-flush">
+        <a href="{% url 'userorders' %}" class="list-group-item list-group-item-action bg-transparent border-0">Payment</a>
+        <a href="{% url 'userorders' %}" class="list-group-item list-group-item-action bg-transparent border-0">Checkout</a>
+        <a href="{% url 'userorders' %}" class="list-group-item list-group-item-action bg-transparent border-0">Delivery Information</a>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+  <p class="text-center mb-0">© 2023 Waggy. All rights reserved.</p>
+</div>
+{% endif %}

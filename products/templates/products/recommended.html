@@ -1,0 +1,116 @@
+<div class="p-4">
+  <div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+      <h1 class="ps-0 p-2">Recommended Products</h1>
+      <a href="{% url 'shop' %}" class=""><button class="btn btn-outline-dark fs-5 px-4 py-2">Shop <i class="bi bi-arrow-right-short fs-4"></i></button></a>
+    </div>
+
+    <div class="row">
+      {% for product in recommendedproducts %}
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 enhance-box d-flex justify-content-center">
+        <div class="card product-card shadow-sm">
+          <div class="position-relative overflow-hidden">
+            <div class="d-flex justify-content-end mt-2 me-2">
+              {% if product.is_available %}
+                <span class="badge bg-success">In Stock</span>
+              {% else %}
+                <span class="badge bg-danger">Out Of Stock</span>
+              {% endif %}
+            </div>
+            <div class="d-flex justify-content-center">
+              {% if product.images.all %}
+                <img src="{{ product.images.all.0.image.url }}" style="width: 200px; height: 200px;" class="product-image card-img-top img-fluid" alt="{{ product.images.all.0.alt_text }}">
+              {% else %}
+                <img src="/static/images/banner1.png" alt="No Image" class="product-image card-img-top img-fluid" style="width: 200px; height: 200px;">
+              {% endif %}
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="card-title mb-0 fw-semibold">{{ product.name|truncatewords:5 }}</h5>
+            </div>
+            <p class="card-text text-muted">{{ product.description|truncatewords:7 }}</p>
+            <div class="mb-3 d-flex gap-1">
+              <span class="text-muted small">Ratings:</span>
+              <h6>
+                {% for i in "12345" %}
+                  {% if forloop.counter <= product.avg_rating|default:0 %}
+                    <i class="fas fa-star text-warning"></i>
+                  {% elif forloop.counter == product.avg_rating|add:"1"|floatformat:0 %}
+                    <i class="fas fa-star-half-alt text-warning"></i>
+                  {% else %}
+                    <i class="far fa-star text-warning"></i>
+                  {% endif %}
+                {% endfor %}
+                ({{ product.review_set.count }})
+              </h6>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                {% if product.weights.all %}
+                  {% with first_weight=product.weights.first %}
+                    <span class="text-muted text-decoration-line-through">₹{{ first_weight.price }}</span>
+                    <span class="h5 mb-0 ms-2 text-success">₹{{ first_weight.discount_price|default_if_none:first_weight.price }}</span>
+                  {% endwith %}
+                {% elif product.sizes.all %}
+                  {% with first_size=product.sizes.first %}
+                    <span class="text-muted text-decoration-line-through">₹{{ first_size.price }}</span>
+                    <span class="h5 mb-0 ms-2 text-success">₹{{ first_size.discount_price|default_if_none:first_size.price }}</span>
+                  {% endwith %}
+                {% else %}
+                  <span class="text-muted">No price available</span>
+                {% endif %}
+              </div>
+              <a href="{% url 'viewproduct' product.product_id %}" class="text-decoration-none text-dark">
+                <button class="btn bg-success-subtle">View</button>
+              </a>
+            </div>
+            <div class="d-grid gap-2">
+              {% with product.weights.all.0 as default_weight %}
+              {% with product.sizes.all.0 as default_size %}
+                {% if default_weight %}
+                  <a href="{% url 'addproduct' product.product_id %}?weight_id={{ default_weight.id }}" class="btn btn-primary w-100">
+                    <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                  </a>
+                {% elif default_size %}
+                  <a href="{% url 'addproduct' product.product_id %}?size_id={{ default_size.id }}" class="btn btn-primary w-100">
+                    <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                  </a>
+                {% else %}
+                  <button class="btn btn-secondary w-100" disabled>No options available</button>
+                {% endif %}
+              {% endwith %}
+              {% endwith %}
+              {% with product.weights.all.0 as default_weight %}
+              {% with product.sizes.all.0 as default_size %}
+                {% if default_weight %}
+                  <a href="{% url 'addwishproduct' product.product_id %}?weight_id={{ default_weight.id }}" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-heart me-2 ms-2"></i>Add to Wishlist
+                  </a>
+                {% elif default_size %}
+                  <a href="{% url 'addwishproduct' product.product_id %}?size_id={{ default_size.id }}" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-heart me-2 ms-2"></i>Add to Wishlist
+                  </a>
+                {% else %}
+                  <button class="btn btn-secondary w-100" disabled>No options available</button>
+                {% endif %}
+              {% endwith %}
+              {% endwith %}
+            </div>
+          </div>
+          <div class="card-footer bg-white">
+            <div class="d-flex justify-content-between text-muted small">
+              <div class="text-start">
+                <span><i class="fas fa-truck me-2"></i>Free Shipping</span>
+              </div>
+              <div class="text-end">
+                <span><i class="fas fa-undo me-2"></i>30 Days Return</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>

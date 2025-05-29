@@ -1,0 +1,52 @@
+{% extends 'home.html' %}
+{% load static %}
+
+{% block content %}
+<div id="aboutus" class="container py-5">
+  <div class="text-center mb-5">
+    <h1 class="display-4 fw-bold">About Waggy Pet Shop</h1>
+    <p class="lead text-muted">Your trusted partner in pet happiness</p>
+  </div>
+
+  <div class="row align-items-center mb-5">
+    <div class="col-md-6">
+      <img src="/static/images/aboutus.png" alt="Happy pets" class="img-fluid rounded shadow">
+    </div>
+    <div class="col-md-6 mt-3">
+      <h2 class="fw-semibold">Who We Are</h2>
+      <p class="text-muted">
+        At <strong>Waggy Pet Shop</strong>, we're more than just a pet store—we're a passionate community of pet lovers committed to bringing joy to every wagging tail. From nutritious pet food to comfy beds and playful toys, we carefully curate our selection to offer the very best for your furry friends.
+      </p>
+      <p class="text-muted">
+        Since our founding, we've been dedicated to creating a one-stop-shop for pet parents. Whether you’re a proud dog owner, a curious cat lover, or an exotic pet enthusiast, Waggy is here to help you care for your companion with love and confidence.
+      </p>
+    </div>
+  </div>
+
+  <div class="row mb-5">
+    <div class="col-md-4 text-center">
+      <i class="fas fa-heart fs-1 text-danger mb-3"></i>
+      <h5 class="fw-semibold">Pet Passion</h5>
+      <p class="text-muted">We treat your pets like our own, with love, care, and respect.</p>
+    </div>
+    <div class="col-md-4 text-center">
+      <i class="fas fa-paw fs-1 text-warning mb-3"></i>
+      <h5 class="fw-semibold">Premium Products</h5>
+      <p class="text-muted">Handpicked items from trusted brands to ensure quality and safety.</p>
+    </div>
+    <div class="col-md-4 text-center">
+      <i class="fas fa-truck fs-1 text-success mb-3"></i>
+      <h5 class="fw-semibold">Fast Delivery</h5>
+      <p class="text-muted">Reliable, quick shipping to bring happiness to your doorstep.</p>
+    </div>
+  </div>
+
+  <div class="bg-light p-4 rounded text-center shadow-sm">
+    <h3 class="fw-bold">Join the Waggy Family</h3>
+    <p class="text-muted">
+      We're proud to serve pet lovers across the country. Explore our store, connect with our team, and make Waggy Pet Shop your go-to for all things pet-related!
+    </p>
+    <a href="{% url 'shop' %}" class="btn btn-primary px-4 py-2 mt-2">Explore Our Products</a>
+  </div>
+</div>
+{% endblock %}

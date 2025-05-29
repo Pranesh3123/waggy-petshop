@@ -1,0 +1,90 @@
+
+<div id="contact" class="container-fluid my-5 p-0" style="background: url('/static/images/contactbanner.png') no-repeat center center; background-size: cover;">
+  <div class="py-5 px-5">
+    <div class="row justify-content-end">
+      <!-- Right-Aligned Contact Form -->
+      <div class="col-lg-6 col-md-12 d-flex align-items-end justify-content-center pt-5 ">
+        <form class="fs-5 w-100" id="contact-form" style="max-width: 500px; padding: 30px; border-radius: 10px;">
+          <h1 class="text-dark mb-4">Contact Us</h1>
+
+          <div class="row mb-3">
+            <div class="col-md-6 mb-3 mb-md-0">
+              <label for="firstName" class="form-label">First Name</label>
+              <input type="text" name="first_name" id="firstName" class="form-control" placeholder="Enter First Name" required>
+            </div>
+            <div class="col-md-6">
+              <label for="lastName" class="form-label">Last Name</label>
+              <input type="text" name="last_name" id="lastName" class="form-control" placeholder="Enter Last Name" required>
+            </div>
+          </div>
+
+          <input type="hidden" name="user_name" id="username">
+
+          <div class="row mb-3">
+            <div class="col-md-6 mb-3 mb-md-0">
+              <label for="email" class="form-label">Email ID</label>
+              <input type="email" name="user_email" id="email" class="form-control" placeholder="Enter Email ID" required>
+            </div>
+            <div class="col-md-6">
+              <label for="phone" class="form-label">Phone(optional)</label>
+              <input type="text" name="user_phone" id="phone" class="form-control" placeholder="Enter Phone Number">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="message" class="form-label">Message</label>
+            <textarea id="message" name="message" class="form-control" rows="4" placeholder="Your message here..."></textarea>
+          </div>
+
+          <div class="text-center">
+            <button type="submit" id="submit-button" class="btn btn-dark px-4">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EmailJS SDK -->
+<script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<script type="text/javascript">
+  (function() {
+    emailjs.init("AE7vRXzxi8v3Njjt1"); 
+  })();
+</script>
+
+<!-- Contact Form Submission -->
+<script>
+  document.getElementById('contact-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    // Combine first and last name into username field
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const form = document.getElementById('contact-form');
+    document.getElementById('username').value = `${firstName} ${lastName}`;
+
+    const submitButton = document.getElementById('submit-button');
+    submitButton.disabled = true;
+    submitButton.innerText = 'Sending...';
+
+    emailjs.sendForm('service_g7j1zgk', 'template_ahxwk3g', this)
+      .then(function() {
+        submitButton.innerText = 'Message Sent';
+        submitButton.classList.remove('btn-dark');
+        submitButton.classList.add('btn-success');
+         setTimeout(() => {
+          submitButton.innerText = 'Submit';
+          submitButton.classList.remove('btn-success');
+          submitButton.classList.add('btn-dark');
+          submitButton.disabled = false;
+        }, 2000);
+        form.reset();
+      }, function(error) {
+        alert('Failed to send message. Please try again.');
+        console.error('FAILED...', error);
+        submitButton.disabled = false;
+        submitButton.innerText = 'Submit';
+      });
+  });
+</script>

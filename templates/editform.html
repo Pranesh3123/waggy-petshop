@@ -1,0 +1,100 @@
+{% extends 'home.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container my-5 border-black rounded shadow bg-light p-3">
+    <h2 class="text-center mb-4">
+        {% if address_type == "shipping" %}
+            Edit Shipping Address
+        {% else %}
+            Edit Profile
+        {% endif %}
+    </h2>
+
+    <form method="POST" enctype="multipart/form-data" class="mt-3 mx-auto w-50">
+        {% csrf_token %}
+
+        {% if address_type == "shipping" %}
+            <!-- Render shipping address fields -->
+            <div class="mb-3">
+                <label class="form-label">{{ form.address_type.label }}</label>
+                {{ form.address_type|add_class:"form-control" }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">{{ form.phone.label }}</label>
+                {{ form.phone|add_class:"form-control" }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">{{ form.address.label }}</label>
+                {{ form.address|add_class:"form-control" }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">{{ form.city.label }}</label>
+                {{ form.city|add_class:"form-control" }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">{{ form.state.label }}</label>
+                {{ form.state|add_class:"form-control" }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">{{ form.pincode.label }}</label>
+                {{ form.pincode|add_class:"form-control" }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">{{ form.country.label }}</label>
+                {{ form.country|add_class:"form-control" }}
+            </div>
+
+        {% else %}
+           <!-- Show Current Profile Picture -->
+    <div class="mb-3 text-center">
+        <label class="form-label">Current Profile Picture</label><br>
+        {% if user_profile.profile_picture %}
+            <img src="{{ user_profile.profile_picture.url }}" style="max-width: 150px; border-radius: 8px;">
+        {% else %}
+            <p>No profile picture uploaded.</p>
+        {% endif %}
+    </div>
+
+    <!-- Upload New Profile Picture -->
+    <div class="mb-3">
+        <label class="form-label">{{ form.new_profile_picture.label }}</label>
+        {{ form.new_profile_picture|add_class:"form-control" }}
+    </div>
+
+
+            <!-- Other profile fields -->
+            <div class="mb-3">
+                <label class="form-label">{{ form.first_name.label }}</label>
+                {{ form.first_name|add_class:"form-control" }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">{{ form.last_name.label }}</label>
+                {{ form.last_name|add_class:"form-control" }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">{{ form.email.label }}</label>
+                {{ form.email|add_class:"form-control" }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">{{ form.phone.label }}</label>
+                {{ form.phone|add_class:"form-control" }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">{{ form.gender.label }}</label>
+                {{ form.gender|add_class:"form-control" }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">{{ form.date_of_birth.label }}</label>
+                {{ form.date_of_birth|add_class:"form-control" }}
+            </div>
+        {% endif %}
+
+        <div class="d-flex justify-content-center gap-3">
+            <button type="submit" class="btn btn-primary w-50">Update</button>
+            <a href="{% url 'userprofile' %}" class="btn btn-danger w-50">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

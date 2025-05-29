@@ -1,0 +1,59 @@
+{% extends 'home.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+  <h2 class="mb-4 text-center">My Orders</h2>
+
+  {% if userorders %}
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle text-center">
+      <thead class="table-primary">
+        <tr>
+          <th>S.No</th>
+          <th>Order ID</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Total</th>
+          <th>Payment Method</th>
+          <th>Items</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in userorders %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>#{{ order.id }}</td>
+          <td>{{ order.created_at|date:"Y-m-d" }}</td>
+          <td>
+            <span class="badge 
+              {% if order.status == 'delivered' %}bg-success
+              {% elif order.status == 'processing' %}bg-warning
+              {% elif order.status == 'cancelled' %}bg-danger
+              {% elif order.status == 'shipped' %}bg-primary
+              {% else %}bg-secondary{% endif %}">
+              {{ order.status|capfirst }}
+            </span>
+          </td>
+          <td>₹{{ order.total_price }}</td>
+          <td>{{ order.payment_method }}</td>
+          <td>{{ order.items.count }}</td>
+          <td>
+            <a href="{% url 'vieworderproduct' order.id %}" class="btn btn-sm btn-outline-primary">View</a>
+             {% if order.status == "processing" or order.status == "shipped" %}
+              <a href="{% url 'cancelorder' order.id %}" class="btn btn-sm btn-outline-danger">
+                Cancel
+              </a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="alert alert-info text-center">You have no orders yet.</div>
+  {% endif %}
+</div>
+{% endblock %}

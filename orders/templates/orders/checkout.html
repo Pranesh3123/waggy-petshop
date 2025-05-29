@@ -1,0 +1,315 @@
+{% load mathfilters %}
+<div class="container-fluid p-5 my-4">
+  <div class="row">
+    <!-- Left Column: Order Summary + Shipping Address -->
+    <div class="col-12 col-md-8">
+      
+      <!-- Order Summary -->
+      <div class="p-3 border rounded shadow-sm mb-4">
+        <h2 class="mb-4">Place Order</h2>
+        <div class="table-responsive">
+          <table class="table table-borderless align-middle">
+            <thead class="table-danger">
+              <tr> 
+                <th>Product</th>
+                <th>Variant</th>
+                <th>Price</th>
+                <th>Qty</th>
+                <th>Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in cart_items %}
+              <tr class="border-bottom">
+                <td>#{{item.product.product_id}} - {{item.product.name|truncatewords:5 }}</td>
+                <td>
+                  {% if item.weight %}
+                    {{ item.weight.weight_label }}
+                  {% elif item.size %}
+                    {{ item.size.size }}
+                  {% else %}
+                    Default
+                  {% endif %}
+                </td>
+                <td>₹
+                  {% if item.weight %}
+                    {{ item.weight.discount_price|default:item.weight.price }}
+                  {% elif item.size %}
+                    {{ item.size.discount_price|default:item.size.price }}
+                  {% else %}
+                    {{ item.product.price }}
+                  {% endif %}
+                </td>
+                <td>{{ item.quantity }}</td>
+                <td class="text-warning">₹{{ item.subtotal }}</td>
+              </tr>
+              {% endfor %}
+              {% if cart_items %}
+              <tr>
+                <td colspan="4" class="text-end"><strong>Delivery:</strong></td>
+                <td><strong class="text-success"> FREE</strong></td>
+              </tr>
+              <tr>
+                <td colspan="4" class="text-end"><strong>Tax:</strong></td>
+                <td><strong class="text-danger">₹250</strong></td>
+              </tr>
+              <tr class="border-top">
+                <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                <td><strong class="text-success">₹{{ total_price|add:250 }}</strong></td>
+              </tr>
+              {% endif %} 
+            </tbody>
+          </table>
+          {% if not cart_items %}
+              <div class="alert alert-warning text-center mt-5" role="alert">
+                No products available in your order list.
+              </div> 
+            {% endif %}
+        </div>
+      </div>
+
+
+      <!-- Shipping Address -->
+      <div class="p-3 border rounded shadow-sm bg-success-subtle">
+        <div class="d-flex justify-content-between" style="cursor: pointer;"> 
+          <h4 class="mb-3">Shipping Address</h4>
+          <a href="{% url 'userprofile' %}" class="">
+            <i class="bi bi-pen fs-4"></i>
+          </a>
+        </div>
+        {% if default_address %}
+        <div class="row">
+          <div class="col-md-6 mb-2"><strong>First Name:</strong> {{ request.user.first_name}}</div>
+          <div class="col-md-6 mb-2"><strong>Last Name:</strong> {{ request.user.last_name }}</div>
+          <div class="col-md-6 mb-2"><strong>Phone:</strong> {{ default_address.phone }}</div>
+          <div class="col-md-6 mb-2"><strong>Email Address:</strong> {{ request.user.email }}</div>
+          <div class="col-md-6 mb-2"><strong>Address Type:</strong> {{ default_address.address_type }}</div>
+          <div class="col-md-6 mb-2"><strong>Address:</strong> {{ default_address.address }}</div>
+          <div class="col-md-6 mb-2"><strong>Town / City / Village:</strong> {{ default_address.city }}</div>
+          <div class="col-md-6 mb-2"><strong>Pincode:</strong> {{ default_address.pincode }}</div>
+          <div class="col-md-6 mb-2"><strong>State:</strong> {{ default_address.state }}</div>
+          <div class="col-md-6 mb-2"><strong>Country / Region:</strong> {{ default_address.country }}</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+     <!-- Right: Order Summary + Payment -->
+    <div class="col-12 col-md-4 mt-4 mt-md-0 bg-body-secondary">
+        <!-- Payment Tabs -->
+        <ul class="nav bg-light nav-pills rounded nav-fill mb-3 mt-3 me-2" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="pill" href="#nav-tab-card">
+              <i class="fa fa-credit-card"></i> Credit Card
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="pill" href="#nav-tab-paypal">
+              <i class="fab fa-paypal"></i> Paypal
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="pill" href="#nav-tab-bank">
+              <i class="fa fa-university"></i> Bank Transfer
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="pill" href="#nav-tab-upi">
+              <i class="fa fa-mobile-alt"></i> UPI
+            </a>
+          </li>
+        </ul>
+
+        <div class="tab-content p-3" >
+          <!-- Credit Card -->
+          <div class="tab-pane fade show active " id="nav-tab-card">
+            <form method="POST" action="{% url 'orderdetails' %}">
+              {% csrf_token %}
+              <input type="hidden" name="payment_method" value="Credit Card">
+              <div class="form-group mb-3">
+                <label>Full Name (on the card)</label>
+                <input type="text" class="form-control" required>
+              </div>
+              <div class="form-group mb-3">
+                <label>Card Number</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" required>
+                  <span class="input-group-text text-muted">
+                    <i class="fab fa-cc-visa me-1"></i>
+                    <i class="fab fa-cc-mastercard me-1"></i>
+                    <i class="fab fa-cc-amex"></i>
+                  </span>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-8">
+                  <label>Expiration</label>
+                  <div class="input-group">
+                    <input type="number" class="form-control" placeholder="MM" required>
+                    <input type="number" class="form-control" placeholder="YY" required>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <label>
+                    CVV
+                    <i class="fa fa-question-circle" data-bs-toggle="tooltip" title="3 digits code on back of card"></i>
+                  </label>
+                  <input type="number" class="form-control" required>
+                </div>
+              </div>
+              <div class="d-flex gap-3">
+                <div class="mb-3">
+                  <label class="form-label">Currency</label>
+                  <input type="text" class="form-control" value="INR" readonly>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Amount</label>
+                  <input type="text" class="form-control" value="₹ {{total_price|add:250}}" readonly>
+                </div>
+              </div>
+                  <button class="btn btn-success w-100 mt-3" type="submit">Confirm Payment</button>
+            </form>
+          </div>
+
+          <!-- PayPal Payment -->
+          <div class="tab-pane fade" id="nav-tab-paypal">
+            <form method="POST" action="{% url 'orderdetails' %}">
+              {% csrf_token %}
+              <input type="hidden" name="payment_method" value="paypal">
+              <div class="mb-3">
+                <label for="paypalEmail" class="form-label">PayPal Email</label>
+                <input type="email" class="form-control" id="paypalEmail" placeholder="your-email@example.com" required>
+              </div>
+              <div class="d-flex gap-3">
+                <div class="mb-3">
+                  <label class="form-label">Currency</label>
+                  <input type="text" class="form-control" value="INR" readonly>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Amount</label>
+                  <input type="text" class="form-control" value="₹ {{total_price|add:250}}" readonly>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="transactionNote" class="form-label">Transaction Note (optional)</label>
+                <textarea class="form-control" id="transactionNote" rows="2" placeholder="e.g., Payment for Order #1234"></textarea>
+              </div>
+
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="paypalConfirm" required>
+                <label class="form-check-label" for="paypalConfirm">
+                  I confirm that I have completed the payment via PayPal.
+                </label>
+              </div>
+                  <button class="btn btn-success w-100 mt-3" type="submit">Confirm Payment</button>
+            </form>
+          </div>
+
+
+          <!-- Bank Transfer -->
+          <div class="tab-pane fade" id="nav-tab-bank">
+            <form method="POST" action="{% url 'orderdetails' %}">
+              {% csrf_token %}
+              <input type="hidden" name="payment_method" value="Bank Transfer">
+              <div class="mb-3">
+                <label class="form-label">Recipient Bank</label>
+                <input type="text" class="form-control" value="HDFC Bank" readonly>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Recipient Account Number</label>
+                <input type="text" class="form-control" value="123456789012" readonly>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">IFSC Code</label>
+                <input type="text" class="form-control" value="HDFC0000001" readonly>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Recipient Name</label>
+                <input type="text" class="form-control" value="waggy-petshop" readonly>
+              </div>
+
+              <div class="d-flex gap-3">
+                <div class="mb-3">
+                  <label class="form-label">Currency</label>
+                  <input type="text" class="form-control" value="INR" readonly>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Amount</label>
+                  <input type="text" class="form-control" value="₹ {{total_price|add:250}}" readonly>
+                </div>
+              </div>
+
+              <hr>
+
+              <h6>Optional: Enter Your Bank Details</h6>
+
+              <div class="mb-3">
+                <label class="form-label">Your Bank</label>
+                <input type="text" class="form-control" placeholder="ABC Bank">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Your Account Number</label>
+                <input type="text" class="form-control" placeholder="987654321098">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Your Full Name</label>
+                <input type="text" class="form-control" placeholder="Jane Doe">
+              </div>
+
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="bankConfirm" required>
+                <label class="form-check-label" for="bankConfirm">
+                  I confirm that I have made the payment through bank transfer.
+                </label>
+              </div>
+                  <button class="btn btn-success w-100 mt-3" type="submit">Confirm Payment</button>
+            </form>
+          </div>
+
+
+         <!-- UPI Payment -->
+        <div class="tab-pane fade mt-5" id="nav-tab-upi">
+          <form method="POST" action="{% url 'orderdetails' %}">
+              {% csrf_token %}
+              <input type="hidden" name="payment_method" value="UPI">
+            <div class="mb-3">
+              <label class="form-label">Recipient UPI ID</label>
+              <input type="text" class="form-control" value="john.doe@hdfcbank" readonly>
+            </div>
+
+            <div class="d-flex gap-3">
+                <div class="mb-3">
+                  <label class="form-label">Currency</label>
+                  <input type="text" class="form-control" value="INR" readonly>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Amount</label>
+                  <input type="text" class="form-control" value="₹ {{total_price|add:250}}" readonly>
+                </div>
+              </div>
+            <div class="mb-3">
+              <label class="form-label">Your UPI ID (optional)</label>
+              <input type="text" class="form-control" placeholder="yourname@upi">
+            </div>
+
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" id="upiConfirm" required>
+              <label class="form-check-label" for="upiConfirm">
+                I confirm that I have sent the payment via UPI.
+              </label>
+            </div>
+              <button class="btn btn-success w-100 mt-3" type="submit">Confirm Payment</button>
+            </form>
+        </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

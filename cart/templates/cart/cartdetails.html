@@ -1,0 +1,160 @@
+<div class="container-fluid my-4 ">
+  <div class="d-flex justify-content-start align-items-center gap-2 mb-3 ps-1">
+      <i class="bi bi-arrow-bar-left fs-1"></i>
+    </a>
+    <h1 class="text-center">Your Cart</h1>
+  </div>
+  <form method="POST" action="{% url 'orders' %}">
+  {% csrf_token %}
+  <div class="row flex-column flex-md-row ps-5 pe-5 ">
+    <!-- Left Side: Cart Items -->
+    <div class="col-12 col-md-9 col-lg-9 rounded shadow" style="max-height: 100%; overflow-y: auto; padding-right: 15px;">
+      <!-- Table Headings -->
+      <div class="row fw-bold text-center d-none d-md-flex border-bottom pb-2 bg-success-subtle">
+        <div class="col-md-5">Product</div>
+        <div class="col-md-2">Quantity</div>
+        <div class="col-md-2">Unit-Price</div>
+        <div class="col-md-2">Sub-Total</div>
+        <div class="col-md-1">Remove</div>
+      </div>
+      {% for item in cart_items %}
+      <!-- Cart Item -->
+      <div class="row align-items-center text-center mt-5 p-2 rounded shadow-sm gx-0 gx-md-3 cart-item"
+          data-price="{% if item.weight %}{{ item.weight.discount_price|default:item.weight.price|floatformat:2 }}
+                      {% elif item.size %}{{ item.size.discount_price|default:item.size.price|floatformat:2 }}{% endif %}">
+        <!-- Product Info -->
+         
+        <div class="col-12 col-md-5 d-flex align-items-center justify-content-center justify-content-md-start mb-2 mb-md-0 gap-2">
+          <a href="{% url 'viewproduct' item.product.product_id %}" class="text-decoration-none text-dark d-flex justify-content-center align-items-center">
+            <img src="{{ item.product.images.all.0.image.url }}" alt="{{ item.product.name }}" width="80" height="80" class="me-2 rounded img-fluid">
+            <p class="mb-0 fw-semibold">#{{ item.product.product_id }} - {{ item.product.name|truncatewords:5 }}</p>
+          </a>
+        </div>
+
+        <!-- Quantity -->
+        <div class="col-12 col-md-2 mb-2 mb-md-0 d-flex justify-content-end justify-content-md-center">
+          <div class="d-flex align-items-center gap-2 me-4">
+            <span class="d-md-none d-block me-2">Quantity:</span>
+            <button type="button" class="btn btn-outline-secondary btn-sm quantity-decrease">−</button>
+            <input 
+                  type="number"
+                  min="1" 
+                  value="{{ item.quantity }}" 
+                  name="quantity_{{ item.id }}"
+                  class="form-control text-center quantity-input" style="width: 60px;">
+            <button type="button" class="btn btn-outline-secondary btn-sm quantity-increase">+</button>
+          </div>
+        </div>
+
+        <!-- Unit Price -->
+        <div class="col-12 col-md-2 mb-2 mb-md-0 d-flex justify-content-center align-items-center mt-3 mt-md-0">
+          <span class="d-md-none d-block">Unit Price:</span>
+          {% if item.weight %}
+            <p class="mb-0 ms-1">₹{{ item.weight.discount_price|floatformat:2 }}</p>
+          {% elif item.size %}
+            <p class="mb-0 ms-1">₹{{ item.size.discount_price|floatformat:2 }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Subtotal -->
+        <div class="col-12 col-md-2 mb-2 mb-md-0 d-flex justify-content-center align-items-center mt-3 mt-md-0">
+          <span class="d-md-none d-block">Subtotal:</span>
+          <p class="mb-0 ms-1 subtotal-value">₹{{ item.subtotal|floatformat:2 }}</p>
+        </div>
+
+        <!-- Remove Button -->
+        <div class="col-12 col-md-1 d-flex justify-content-center align-items-center mt-2 mt-md-0">
+          {% if item.id %}
+            <a href="{% url 'removeaddproduct' item.id %}" class="btn btn-outline-danger btn-sm" aria-label="Remove product #{{ item.product.product_id }}">
+              <i class="fas fa-trash"></i>
+            </a>
+          {% else %}
+            <button class="btn btn-outline-danger btn-sm" disabled>
+              <i class="fas fa-trash"></i>
+            </button>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+      {% if not cart_items %}
+        <div class="alert alert-warning text-center mt-5" role="alert">
+          No products available in your cart.
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Right Side: Cart Summary -->
+    <div class="col-12 col-md-3 col-lg-3 mt-4 mt-md-0">
+      <div class="border p-4 rounded shadow-sm bg-light text-start mt-5">
+        <div class="d-flex justify-content-between">
+          <p class="mb-1 fw-semibold">Total:</p>
+          <p class="text-success fw-bold mb-1 " id="total-price">₹{{ total_price }}</p>
+        </div>
+          <a href="{% url 'shop' %}" class="">
+            <button type="button" class="btn btn-outline-primary w-100">Continue To Shop</button>
+          </a>
+          <a href="{% url 'orders' %}">
+            <button type="submit" class="btn btn-primary w-100 mt-2">Proceed To Checkout</button>
+          </a>
+      </div>
+    </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.cart-item').forEach(itemRow => {
+  const quantityInput = itemRow.querySelector('.quantity-input');
+  const subtotalElem = itemRow.querySelector('.subtotal-value');
+  const unitPrice = parseFloat(itemRow.getAttribute('data-price'));
+
+  function updateSubtotal() {
+    let quantity = parseInt(quantityInput.value);
+    if (isNaN(quantity) || quantity < 1) {
+      quantity = 1;
+      quantityInput.value = quantity;
+    }
+    const newSubtotal = (unitPrice * quantity).toFixed(2);
+    subtotalElem.textContent = `₹${newSubtotal}`;
+
+    updateTotal();
+    updateSubtotal();
+    // Optionally: Update total price here or trigger an event
+  }
+
+  // On manual input change
+  quantityInput.addEventListener('change', updateSubtotal);
+
+  // On plus button click
+  itemRow.querySelector('.quantity-increase').addEventListener('click', () => {
+    quantityInput.value = parseInt(quantityInput.value) + 1;
+    updateSubtotal();
+  });
+
+  // On minus button click if you have one
+  const minusBtn = itemRow.querySelector('.quantity-decrease');
+  if (minusBtn) {
+    minusBtn.addEventListener('click', () => {
+      let val = parseInt(quantityInput.value);
+      if (val > 1) {
+        quantityInput.value = val - 1;
+        updateSubtotal();
+      }
+    });
+  }
+});
+
+function updateTotal() {
+  const allSubtotals = document.querySelectorAll('.subtotal-value');
+  let total = 0;
+  allSubtotals.forEach(el => {
+    const text = el.textContent.replace(/[^0-9.]/g, ''); // Remove ₹ and any non-numeric
+    const value = parseFloat(text);
+    if (!isNaN(value)) {
+      total += value;
+    }
+  });
+  document.getElementById('total-price').textContent = `₹${total.toFixed(2)}`;
+}
+updateTotal();
+</script>

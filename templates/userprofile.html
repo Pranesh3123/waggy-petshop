@@ -1,0 +1,96 @@
+{% extends 'home.html' %}
+{% load static %}
+{% block content %}
+  <div class="container mt-5">
+  <div class="row">
+    <!-- Left Side: User Details -->
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm p-3 bg-dark-subtle">
+        <div class="d-flex justify-content-between">
+            <div class="">
+                <h5 class="mb-3">User Profile</h5>
+            </div>
+            <div class="" style="cursor: pointer;"> 
+                <a href="{% url 'edituserprofile' %}" class="">
+                  <i class="bi bi-pen"></i>
+                </a>
+            </div>
+        </div>  
+        <img src="{{user_profile.profile_picture.url}}" class="img-thumbnail mb-3" alt="User Image">
+        <p><strong>Name:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Gender:</strong> {{ user_profile.gender}}</p>
+        <p><strong>Phone:</strong> {{ user_profile.phone }}</p>
+        <p><strong>DOB:</strong> {{ user_profile.date_of_birth}}</p>
+        <p><strong>Joined:</strong> {{ user.date_joined }}</p>
+      </div>
+    </div>
+
+    <!-- Right Side: Shipping Address (Top) and Orders (Bottom) -->
+    <div class="col-md-8" >
+      <!-- Shipping Address -->
+      <div class="card shadow-sm p-3 mb-4 bg-body-secondary" style="max-height: 50vh; overflow-y: auto;">
+        <div class="d-flex justify-content-between">
+            <div class="">
+                <h5 class="mb- fw-bolder">Shipping Address</h5>
+            </div>
+        </div>
+        {% for address in user_addresses %}
+        <div class="border p-2 mb-2 rounded bg-light">
+          <p><strong>{{address.address_type}} - address</strong></p>
+          <hr>
+          <p><strong>{{ address.name }}</strong></p>
+          <p>{{ address.address }} <br> {{ address.city }}, {{ address.state }} - {{ address.pincode }}.</p>
+          <p>{{ address.country }} | Phone: {{ address.phone }}</p>
+          <div class="d-flex gap-2">
+            <a href="{% url 'editshippingaddress' address.id %}"  class="btn btn-sm btn-outline-secondary">Edit</a>
+            <a href="{% url 'deleteshippingaddress' user.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+            {% if address.default %}
+              <span class="badge bg-success">Default</span>
+            {% else %}
+              <a href="{% url 'setdefaultshippingaddress' address.id %}" class="btn btn-sm btn-outline-primary">Set as Default</a>
+            {% endif %}
+          </div>
+        </div>
+        {% empty %}
+        <p>No shipping addresses added.</p>
+        {% endfor %}
+        <a href="{% url 'addshippingaddress' %}" class="btn btn-sm btn-primary mt-2">Add New Address</a>
+      </div>
+
+      <!-- User Orders -->
+      <div class="card shadow-sm p-3 table-responsive" style="max-height: 50vh; overflow-y: auto;">
+        <h5 class="fw-bolder">User Orders</h5>
+        <table class="table table-bordered table-striped table-sm mt-3">
+          <thead class="table-primary">
+            <tr>
+              <th>S.No</th>
+              <th>Order ID</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in user_orders %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>#{{ order.id }}</td>
+              <td>{{ order.created_at|date:"Y-m-d" }}</td>
+              <td>{{ order.status }}</td>
+              <td>₹{{ order.total_price }}</td>
+              <td><a href="{% url 'vieworderproduct' order.id %}" class="btn btn-sm btn-info">View</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center">No orders found.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

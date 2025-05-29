@@ -1,0 +1,41 @@
+{% extends 'home.html' %}
+{% load static %}
+
+{% block content %}
+    {% include 'products/offerslide.html' %}
+   <div class="container-fluid mt-3">
+  <div class="row">
+    <!-- Sidebar (Desktop & Mobile Toggle Button) -->
+    <div class="col-12 col-lg-2">
+      <!-- Mobile Filter Button -->
+      <div class="d-sm-none mb-3">
+        <button class="btn bg-dark-subtle w-100" data-bs-toggle="offcanvas" data-bs-target="#mobileFilterSidebar">
+          <i class="fas fa-sliders-h me-1"></i> Filters
+        </button>
+      </div>
+
+      <!-- Desktop Filter Sidebar -->
+      <div class="d-none d-sm-block">
+        {% include "products/categories.html" with is_mobile=False %}
+      </div>
+
+      <!-- Mobile Offcanvas Filter Sidebar -->
+      <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileFilterSidebar">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title">Filters</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+          {% include "products/categories.html" with is_mobile=True %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Listing Area -->
+    <div class="col-12 col-lg-10">
+      {% include 'products/allproducts.html' %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends 'home.html' %}
+
+{% block content %}
+{% if hide_footer %}
+<style>
+    body {
+  background-image: url('/static/images/loginbanner.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position:top;
+  background-attachment: fixed;
+}
+</style>
+
+  <div class="container-fluid fw-bolder fs-5">
+    <div class="row p-2 p-md-5 m-2 m-md-5 d-flex justify-content-lg-start align-items-center">
+        <!-- For small screens, use col-12 with offset and center alignment -->
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+            <!-- Nav Pills -->
+            <ul class="nav nav-pills nav-justified gap-2 gap-md-3 mt-4 mt-md-5" id="pills-tab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link {% if page == 'login' %}active{% endif %}" id="tab-login" 
+                        data-bs-toggle="pill" href="#pills-login" role="tab" aria-controls="pills-login" 
+                        aria-selected="true">Login</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link {% if page == 'register' %}active{% endif %}" id="tab-register" 
+                        data-bs-toggle="pill" href="#pills-register" role="tab" aria-controls="pills-register" 
+                        aria-selected="false">Register</a>
+                </li>
+            </ul>
+
+            <!-- Login & Register Forms -->
+            <div class="tab-content mt-3 mt-md-4">
+                <!-- Login Form -->
+                <div class="tab-pane fade {% if page == 'login' %}show active{% endif %}" id="pills-login">
+                    <form method="POST" action="{% url 'login' %}" class="p-2 p-md-3">
+                        {% csrf_token %}
+
+                        <!-- Input Fields -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-floating mb-5">
+                                    <input type="text" class="form-control" id="loginName" name="email" placeholder="Username">
+                                    <label for="loginName" class="fs-6">Email</label>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input type="password" id="loginPassword" class="form-control" name="password" placeholder="Password">
+                                    <label for="loginPassword" class="fs-6">Password</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex flex-column flex-sm-row gap-2 gap-md-3 mt-3 mt-md-4">
+                            <button type="submit" class="btn btn-primary px-4">Sign in</button>
+                            <a href="{% url 'home' %}" class="btn btn-danger px-4">Back</a>
+                        </div>
+                    </form>
+                    <div class="mt-2 mt-md-3">
+                        {% if statusLogin %}
+                        <div class="alert alert-danger text-center w-100 fs-6 fs-md-5">
+                            <h5 class="text-muted">{{messageLogin}}</h5>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Register Form -->
+                <div class="tab-pane fade {% if page == 'register' %}show active{% endif %}" id="pills-register">
+                    <div class="container mt-3 mt-md-4 px-0">
+                        <form method="POST" action="{% url 'register' %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="id_name" class="form-label">Name</label>
+                                <input type="text" class="form-control" name="name" id="id_name" maxlength="200" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_username" class="form-label">Username</label>
+                                <div class="d-flex gap-2">
+                                    <input type="text" class="form-control w-100" name="username" id="id_username" maxlength="150" required>
+                                    <i class="bi bi-info-circle mt-1 text-white" data-bs-toggle="tooltip" data-bs-placement="bottom" style="cursor: pointer;"
+                                        title="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.">
+                                    </i>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_email" class="form-label">Email</label>
+                                <input type="email" class="form-control" name="email" id="id_email" maxlength="254" required>
+                            </div>
+                        
+                            <div class="d-lg-flex mb-3 gap-2">
+                                <div class="">
+                                    <label for="id_password1" class="form-label">Password</label>
+                                    <div class="d-lg-flex gap-2">
+                                    <input type="password" class="form-control" name="password1" id="id_password1" required>
+                                    <i class="bi bi-info-circle mt-1 text-white" data-bs-toggle="tooltip" data-bs-placement="bottom" style="cursor: pointer;"
+                                    title="• Your password can’t be too similar to your other personal information.
+• Must contain at least 8 characters.
+• Can’t be a commonly used password.
+• Can’t be entirely numeric."></i>
+                                </div>
+                                </div>
+                                 <div class="mb-3">
+                                    <label for="id_password2" class="form-label">Confirm Password</label>
+                                    <div class="d-lg-flex gap-2">
+                                        <input type="password" class="form-control" name="password2" id="id_password2" required>
+                                        <i class="bi bi-info-circle mt-1 text-white" data-bs-toggle="tooltip" data-bs-placement="bottom" style="cursor: pointer;"
+                                        title="Enter the same password as before, for verification.">
+                                    </i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column flex-sm-row gap-2 gap-md-3">
+                                <button type="submit" class="btn btn-primary w-100 w-sm-25">Register</button>
+                                <a href="{% url 'home' %}" class="btn btn-danger w-100 w-sm-25">Back</a>
+                            </div>
+                        </form>
+
+                        <div class="mt-3 mt-md-4">
+                            {% if statusRegister %}
+                            <div class="alert alert-danger text-center w-100 fs-6 fs-md-5">
+                                <h5 class="text-muted">{{messageRegister}}</h5>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- End Tab Content -->
+        </div>
+    </div>
+</div>
+
+<!-- Remember Active Tab After Refresh -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let activeTab = localStorage.getItem("activeTab");
+
+        if (activeTab) {
+            let tabElement = document.querySelector(`[href="${activeTab}"]`);
+            if (tabElement) {
+                new bootstrap.Tab(tabElement).show();
+            }
+        }
+
+        document.querySelectorAll('.nav-link').forEach(tab => {
+            tab.addEventListener("click", function () {
+                localStorage.setItem("activeTab", this.getAttribute("href"));
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
+    });
+</script>
+
+{% endif %}
+{% endblock %}

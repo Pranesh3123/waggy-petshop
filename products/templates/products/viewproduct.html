@@ -1,0 +1,292 @@
+{% extends 'home.html' %}
+{% load static %}
+{% block content %}
+<div class="container py-5">
+  <div class="row gy-4">
+    <!-- Product Image Section -->
+    <div class="col-12 col-md-6 text-center" style="cursor: pointer;">
+  <img id="mainProductImage" src="{{ product.images.first.image.url }}" alt="Main Image" class="img-fluid w-75 rounded shadow" />
+  <div class="row mt-3 g-2 justify-content-center">
+    {% for img in product.images.all|slice:"1:" %}
+    <div class="col-4 col-sm-3 col-md-3 col-lg-2">
+      <img 
+        src="{{ img.image.url }}" 
+        class="thumb-image img-fluid rounded border w-100" 
+        alt="{{ img.alt_text }}" 
+        onclick="changeMainImage(this)">
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+
+    <!-- Product Info Section -->
+    <div class="col-12 col-md-6">
+      <h2 class="fw-bold fs-3">{{ product.name }}</h2>
+      <p class="text-muted">{{ product.description }}</p>
+
+      <!-- Ratings -->
+      <div class="mb-3">
+        <h6>
+          <span class="text-muted small fs-5 fw-bold">Customer Ratings:</span>
+          {% for i in "12345" %}
+            {% if forloop.counter <= product.average_rating %}
+              <i class="fas fa-star text-warning"></i>
+            {% elif forloop.counter == product.average_rating|add:"1"|floatformat:0 %}
+              <i class="fas fa-star-half-alt text-warning"></i>
+            {% else %}
+              <i class="far fa-star text-warning"></i>
+            {% endif %}
+          {% endfor %}
+          ({{ product.review_count }})
+        </h6>
+      </div>
+
+      {% if product.color %}
+      <div class="mb-3">
+        <h6 class="fw-bold mb-1">Available Color:</h6>
+        <p class="mb-2">Red / Blue / Green</p>
+      </div>
+      {% endif %}
+
+      <!-- Size -->
+      {% if product.sizes.all %}
+      <div class="mb-3">
+        <h6 class="fw-bold mb-1">Available Size:</h6>
+        <div class="d-flex flex-wrap gap-2">
+          {% for pro_size in product.sizes.all %}
+          <button class="btn btn-outline-primary option-button"
+            data-id="{{ pro_size.id }}"
+            data-type="size"
+            data-price="{{ pro_size.price }}"
+            data-discount="{{ pro_size.discount_price|default_if_none:pro_size.price }}"
+            onclick="updateOption(this)">
+            {{ pro_size.get_size_display }}
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Weight -->
+      {% if product.weights.all %}
+      <div class="mb-3">
+        <h6 class="fw-bold mb-1">Available Weight:</h6>
+        <div class="d-flex flex-wrap gap-2">
+          {% for pro_weight in product.weights.all %}
+          <button class="btn btn-outline-primary option-button"
+            data-id="{{ pro_weight.id }}"
+            data-type="weight"
+            data-price="{{ pro_weight.price }}"
+            data-discount="{{ pro_weight.discount_price|default_if_none:pro_weight.price }}"
+            onclick="updateOption(this)">
+            {{ pro_weight.weight_label }}
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Price -->
+      <div class="mb-3">
+        <span class="text-danger text-decoration-line-through me-2" id="originalPriceDisplay">₹0.00</span>
+        <span class="text-success fs-4" id="discountPriceDisplay">₹0.00</span>
+      </div>
+
+      <!-- Stock -->
+      <div class="mb-3 d-flex flex-column flex-md-row align-items-start gap-2">
+        <h6 class="fw-bold mb-0">Stock:</h6>
+        {% if product.is_available %}
+        <p class="badge bg-success mb-0">In Stock</p>
+        {% else %}
+        <p class="badge bg-danger mb-0">Out Of Stock</p>
+        {% endif %}
+      </div>
+
+      <!-- Add to Cart -->
+      <div class="d-flex flex-column flex-sm-row gap-2 mb-4">
+        <div class=""></div>
+        <a id="dynamicCartLink" href="#" class="btn btn-primary">
+          <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+        </a>
+        <a id="dynamicWishlistLink" href="#" class="btn btn-outline-secondary">
+          <i class="fas fa-heart me-2 ms-2 "></i>
+        </a>
+      </div>
+      <div class="d-flex mt-3">
+        <h5 class="fw-bold">Brand:</h5>
+        <h6 class="mt-1">{{product.brand}}</h6>
+      </div>
+      <div class="d-flex mt-3">
+        <h5 class="fw-bold">Category:</h5>
+        <h6 class="mt-1">{{product.category.type}}</h6>
+      </div>
+      <div class="d-flex mt-3">
+        <h5 class="fw-bold">tags:</h5>
+        <h6 class="mt-1">{{product.category.tag}}</h6>
+      </div>
+    </div>
+  </div>
+  <!-- Reviews -->
+  <div class="mt-5">
+    <div class="row gy-4">
+      <div class="col-12 col-md-6">
+        <h4>All Reviews</h4><hr>
+        <h5>Overall Rating</h5>
+        <h5>
+          {% if avg_rating > 0 %}
+            {% with full_stars=avg_rating|floatformat:0 %}
+              {% for i in "12345" %}
+                {% if forloop.counter <= full_stars|add:"0" %}
+                <i class="fas fa-star text-warning"></i>
+                {% else %}
+                <i class="far fa-star text-warning"></i>
+                {% endif %}
+              {% endfor %}
+            {% endwith %}
+            ({{ product.reviews.count }})
+          {% else %}
+            <span>No ratings yet</span>
+          {% endif %}
+        </h5>
+      </div>
+
+      <!-- Review Form -->
+      <div class="col-12 col-md-6">
+        <button class="btn bg-primary-subtle w-100 fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#reviewFormSm">
+          Write a Review <i class="bi bi-list-task fs-5"></i>
+        </button>
+
+        <div class="collapse mt-2" id="reviewFormSm">
+          <form action="" method="POST" class="border p-3 rounded">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="reviewer_name" class="form-label">Your Name</label>
+              <input type="text" class="form-control" id="reviewer_name" name="reviewer_name" value="{{ request.user }}" readonly>
+            </div>
+            <div class="mb-3">
+              <label for="review_text" class="form-label">Your Review</label>
+              <textarea class="form-control" id="review_text" name="review_text" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="rating" class="form-label">Rating</label>
+              <select class="form-select" id="rating" name="rating" required>
+                <option value="">Choose...</option>
+                <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                <option value="4">⭐⭐⭐⭐ (4)</option>
+                <option value="3">⭐⭐⭐ (3)</option>
+                <option value="2">⭐⭐ (2)</option>
+                <option value="1">⭐ (1)</option>
+              </select>
+            </div>
+            <div class="d-flex justify-content-between">
+              <button type="submit" class="btn btn-success">Submit Review</button>
+              <button type="reset" class="btn btn-danger">Clear</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Individual Reviews -->
+    {% if product.reviews.all %}
+      {% for review in product.reviews.all %}
+        <div class="d-flex flex-column flex-md-row mt-4 rounded shadow">
+          <div class="me-md-3 mb-2 mb-md-0 ms-2">
+            <img src="{% static 'profileImg/default.webp' %}" class="rounded-circle border" width="40" height="40" alt="Profile">
+          </div>
+          <div>
+            <h6 class="mb-1">{{ review.user.username }} <sub class="text-muted">{{ review.created_at|timesince }} ago</sub></h6>
+            <div class="mb-2">
+              {% for i in "12345" %}
+                {% if forloop.counter <= review.rating %}
+                <i class="fas fa-star text-warning fs-6"></i>
+                {% else %}
+                <i class="far fa-star text-warning fs-6"></i>
+                {% endif %}
+              {% endfor %}
+            </div>
+            <p class="text-justify me-2">{{ review.comment }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="mt-4 text-muted">No reviews yet. Be the first to write one!</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- JS -->
+<script>
+ let selectedOption = {};
+
+function updateOption(button) {
+  const price = parseFloat(button.dataset.price) || 0;
+  const discount = parseFloat(button.dataset.discount) || price;
+  const type = button.dataset.type;
+  const id = button.dataset.id;
+
+  selectedOption[type] = id;
+
+  document.getElementById('originalPriceDisplay').textContent = `₹${price.toFixed(2)}`;
+  document.getElementById('discountPriceDisplay').textContent = `₹${discount.toFixed(2)}`;
+
+  // Toggle active class on option buttons
+  document.querySelectorAll(`.option-button[data-type="${type}"]`).forEach(btn => btn.classList.remove('active'));
+  button.classList.add('active');
+
+  const productId = '{{ product.product_id }}';
+
+  // Update Add to Cart link (you already have this)
+  let cartHref = `{% url 'addproduct' 'PRODUCT_ID' %}`.replace('PRODUCT_ID', productId);
+  if (selectedOption.weight) {
+    cartHref += `?weight_id=${selectedOption.weight}`;
+  } else if (selectedOption.size) {
+    cartHref += `?size_id=${selectedOption.size}`;
+  }
+  document.getElementById('dynamicCartLink').href = cartHref;
+
+  // Update Add to Wishlist link similarly
+  let wishlistHref = `{% url 'addwishproduct' 'PRODUCT_ID' %}`.replace('PRODUCT_ID', productId);
+  if (selectedOption.weight) {
+    wishlistHref += `?weight_id=${selectedOption.weight}`;
+  } else if (selectedOption.size) {
+    wishlistHref += `?size_id=${selectedOption.size}`;
+  }
+  document.getElementById('dynamicWishlistLink').href = wishlistHref;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const defaultButton = document.querySelector('.option-button');
+  if (defaultButton) {
+    defaultButton.click(); // initialize links and prices
+  }
+});
+
+
+ let resetTimeout;
+  const originalSrc = "{{ product.images.first.image.url }}";  // Store original image source
+
+  function changeMainImage(thumbnail) {
+    const mainImage = document.getElementById('mainProductImage');
+    
+    // Change the main image immediately
+    mainImage.src = thumbnail.src;
+
+    // Clear any previous timeout to avoid multiple resets
+    if (resetTimeout) {
+      clearTimeout(resetTimeout);
+    }
+
+    // Set timeout to reset to original image after 5 seconds
+    resetTimeout = setTimeout(() => {
+      mainImage.src = originalSrc;
+    }, 10000); // 5000 ms = 5 seconds
+
+    // Optional: Visual indicator on the active thumbnail
+    const allThumbs = document.querySelectorAll('.thumb-image');
+    allThumbs.forEach(img => img.classList.remove('border-primary', 'border-2'));
+    thumbnail.classList.add('border-primary', 'border-2');
+  }
+</script>
+{% endblock %}

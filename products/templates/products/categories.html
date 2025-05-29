@@ -1,0 +1,136 @@
+<div class="filter-container">
+  <div class="filter-header">
+    <button class="btn btn-sm btn-primary" onclick="applyFilters()" {% if is_mobile %}data-bs-dismiss="offcanvas"{% endif %}>Search</button>
+    <button class="btn btn-sm btn-outline-danger" onclick="clearFilters()">Clear</button>
+  </div>
+
+  <!-- Categories -->
+  <div class="filter-section">
+    <div class="filter-heading">Categories</div>
+    <ul class="filter-list">
+      {% for animal_key, animal_value in animal_type_choices %}
+        <li class="filter-item {% if animal_value == selected_type or animal_value == 'All' %}active{% endif %}" onclick="toggleFilter(this)">
+          {{ animal_value }}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- Tags -->
+  <div class="filter-section">
+    <div class="filter-heading">Tags</div>
+    <ul class="filter-list">
+      {% for tag_key, tag_value in tag_choices %}
+        <li class="filter-item {% if tag_value == selected_type %}active{% endif %}" onclick="toggleFilter(this)">
+          {{ tag_value }}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- Brands -->
+  <div class="filter-section">
+    <div class="filter-heading">Brands</div>
+    <ul class="filter-list">
+      {% for brand in available_brands %}
+        <li class="filter-item" onclick="toggleFilter(this)">{{ brand }}</li>
+      {% empty %}
+        <li>No brands available</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- Price -->
+  <div class="filter-section">
+    <div class="filter-heading">Price</div>
+    <ul class="filter-list">
+      <li class="filter-item" onclick="toggleFilter(this)">Under ₹500</li>
+      <li class="filter-item" onclick="toggleFilter(this)">₹500 – ₹1000</li>
+      <li class="filter-item" onclick="toggleFilter(this)">₹1000 – ₹2000</li>
+      <li class="filter-item" onclick="toggleFilter(this)">₹2000+</li>
+    </ul>
+  </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+  // Toggle active class
+  function toggleFilter(el) {
+    // If "All" is clicked, deactivate all others
+    if (el.textContent.trim().toLowerCase() === "all") {
+      document.querySelectorAll('.filter-item').forEach(item => item.classList.remove('active'));
+      el.classList.add('active');
+    } else {
+      // If any other filter is clicked, remove "All" if it's active
+      document.querySelectorAll('.filter-item').forEach(item => {
+        if (item.textContent.trim().toLowerCase() === "all") {
+          item.classList.remove('active');
+        }
+      });
+
+      // Toggle current clicked filter
+      el.classList.toggle("active");
+    }
+  }
+
+  // Clear all filters
+ function clearFilters() {
+  // Remove active class from all filter items
+  document.querySelectorAll('.filter-item').forEach(el => el.classList.remove('active'));
+
+  // Optionally re-activate "All" if present
+  const allItem = Array.from(document.querySelectorAll('.filter-item'))
+    .find(el => el.textContent.trim().toLowerCase() === 'all');
+  if (allItem) allItem.classList.add('active');
+
+  // Redirect to show all products without filters
+  window.location.href = `${window.location.origin}/shop/`;
+}
+
+  // Apply filters
+    function applyFilters() {
+    const filters = {
+      Categories: [],
+      Tags: [],
+      Brands: [],
+      Price: []
+    };
+
+    document.querySelectorAll('.filter-section').forEach(section => {
+      const heading = section.querySelector('.filter-heading')?.textContent.trim();
+      const selectedItems = section.querySelectorAll('.filter-item.active');
+
+      
+      selectedItems.forEach(item => {
+        if (filters[heading]) {
+          filters[heading].push(item.textContent.trim());
+        }
+      });
+    });
+      
+    const params = new URLSearchParams();
+
+  filters.Categories.forEach(cat => params.append('category', cat));
+  filters.Tags.forEach(tag => params.append('tag', tag));
+  filters.Brands.forEach(brand => params.append('brand', brand));
+  filters.Price.forEach(price => params.append('price', price));
+
+  const url = `${window.location.origin}/shop/?${params.toString()}`;
+
+  console.log("Redirecting to:", url);  // debug
+
+  window.location.href = url;
+  }
+
+  // On page load: activate "All" if nothing is selected (mobile version)
+  window.addEventListener('DOMContentLoaded', () => {
+    const activeItems = document.querySelectorAll('.filter-item.active');
+    if (activeItems.length === 0) {
+      const allItem = Array.from(document.querySelectorAll('.filter-item'))
+        .find(el => el.textContent.trim().toLowerCase() === 'all');
+      if (allItem) allItem.classList.add('active');
+    }
+  });
+</script>
+
+
